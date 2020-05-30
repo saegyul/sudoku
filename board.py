@@ -1,12 +1,11 @@
+from solver import sudoku_solve, display, possible
 import random
-import numpy as np
-import time
-from curtsies import FullscreenWindow, fsarray, Input
+
 
 class Board:
-    def __init__(self,grid = None):
-        self.bd = [ [0]*9 for _ in range(9)]
-        if grid and (len(grid) == 9) and (len(grid[0])  == 9):
+    def __init__(self, grid=None):
+        self.bd = [[0]*9 for _ in range(9)]
+        if grid and (len(grid) == 9) and (len(grid[0]) == 9):
             for i in range(9):
                 for j in range(9):
                     self.bd[i][j] = grid[i][j]
@@ -20,27 +19,11 @@ class Board:
             print('')
         print('----'*9)
 
-    def display(self,grid=None,stop=False,pause=0):
-        if not grid: grid = self.bd
-        m = ["-"*30]
-        for r in grid:
-            mm = "|"
-            for e in r:
-                mm = mm + ' ' + (str(e) if e else ' ') + ' '
-            mm += '|'
-            m.append(mm)
-        m.append("-"*30)
+    def display(self, stop=False):
+        display(self.bd, stop)
 
-        if stop:
-            m.append("Hit any key to see more")
-
-        with Input() as input:
-            with FullscreenWindow() as win:
-                win.render_to_terminal(fsarray(m))
-                if stop:
-                    c = input.next()
-                if not pause:
-                    time.sleep(pause)
+    def solve(self):
+        sudoku_solve(self)
 
     def reset(self):
         for i in range(9):
@@ -57,46 +40,23 @@ class Board:
                 print(f'filled ({i},{j}) with ({c})')
                 self.bd[i][j] = c
 
-    def possible(self, i, j, n):
-        for k in range(9):
-            if self.bd[i][k] == n:
-                return False
+    def fillFromString(self, numstr):
+        if len(numstr) != 9:
+            print("Not a valid number of rows")
+            return
 
-        for k in range(9):
-            if self.bd[k][j] == n:
-                return False
+        for i, n in enumerate(numstr):
+            if len(n) != 9:
+                print("Not enough column in row ", i)
+                return
+            for j, c in enumerate(n):
+                self.bd[i][j] = int(c)
 
-        bi = (i // 3)*3
-        bj = (j // 3)*3
-        for i in range(9):
-            if self.bd[bi+i//3][bj+i%3] == n:
-                    return False
-
-        return True
-
-    def sudoku_solve(self):
-        def solve(grid,animated=False):
-            for i in range(9):
-                for j in range(9):
-                    if grid[i][j] == 0:
-                        for n in range(1, 10):
-                            if self.possible(i, j, n):
-                                grid[i][j] = n
-                                if animated: self.display(grid,pause=0.025)
-                                solve(grid,animated)
-                                grid[i][j] = 0
-                                if animated: self.display(grid,pause=0.025)
-                        return
-            self.display(grid,stop=True)
-        
-        solve(self.bd,False)
+    def copyGrid(self):
+        return [self.bd[i].copy() for i in range(9)]
 
 
-    def random(self):
-        choice = list(range(1, 10))
-        for i in range(9):
-            for j in range(9):
-                self.bd[i][j] = random.choice(choice)
+
 
     def fakeValid(self):
         for i in self.bd:
@@ -133,54 +93,3 @@ class Board:
                     s += sum(subm[k])
                 if s != 45:
                     return False
-
-
-if __name__ == "__main__":
-    grid = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]]
-    grid0 = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 0, 0]]
-
-    grid1 = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 6, 0, 1, 0, 7, 3, 0, 0],
-        [1, 2, 0, 0, 5, 0, 0, 0, 8],
-        [0, 0, 8, 7, 0, 1, 0, 0, 6],
-        [0, 7, 0, 0, 0, 0, 0, 1, 0],
-        [4, 0, 0, 9, 0, 8, 2, 0, 0],
-        [5, 0, 0, 0, 8, 0, 0, 7, 4],
-        [0, 0, 4, 5, 0, 3, 0, 6, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
-    grid2 = [[3, 0, 0, 9, 8, 2, 0, 1, 0],
-        [2, 1, 5, 7, 0, 0, 4, 8, 9],
-        [0, 9, 0, 0, 5, 0, 2, 6, 3],
-        [7, 0, 0, 0, 9, 0, 1, 0, 6],
-        [1, 5, 0, 0, 0, 0, 0, 7, 4],
-        [0, 0, 3, 0, 7, 0, 0, 0, 2],
-        [0, 8, 0, 0, 4, 0, 0, 2, 1],
-        [0, 0, 1, 8, 2, 9, 6, 0, 0],
-        [0, 0, 0, 5, 1, 0, 0, 0, 8]]
-
-    b = Board(grid0)
-    # b.random()
-    # b.disp()
-    # b.fakeValid()
-    # b.reset()
-    # b.disp()
-    # b.fill()
-    b.display(stop=True)
-    b.sudoku_solve()
-
