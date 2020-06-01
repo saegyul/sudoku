@@ -52,6 +52,13 @@ class Board:
             for j, c in enumerate(n):
                 self.bd[i][j] = int(c)
 
+
+    def fillFromUser(self):
+        puz = input("Enter the puzzle string, which is sepated by ':' ")
+        rows = puz.split(':')
+        self.fillFromString(rows)
+
+
     def copyGrid(self):
         return [self.bd[i].copy() for i in range(9)]
 

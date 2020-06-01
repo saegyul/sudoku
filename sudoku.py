@@ -3,16 +3,55 @@ from PyQt5.QtWidgets import QApplication, QDialog
 #from ui_imagedialog import Ui_ImageDialog
 from board import Board
 import solver
+from gui import SudokuWindow
 
 
 def main():
     app = QApplication(sys.argv)
-    window = QDialog()
+    window = SudokuWindow()
 #    ui = Ui_ImageDialog()
 #    ui.setuipUi(window)
 
     window.show()
     sys.exit(app.exec_())
+
+def gen_puzzle():
+    b1 = Board()
+    solver.generate_puzzle(b1.bd)
+    b1.display(stop=True)
+
+    ans = []
+    solver.find_solution(b1,ans)
+    for bd in ans:
+        Board(bd).show()
+        c = input("next : ")
+
+def sol_puzzle():
+    b2 = Board()
+    b2.fillFromUser()
+    b2.display(stop=True)
+
+    ans = []
+    solver.find_solution(b2, ans)
+
+    for bd in ans:
+        Board(bd).show()
+        c = input("more answer ?")
+
+def do_nothing(): pass
+
+def main_int():
+    cho = {"1":sol_puzzle,"2":gen_puzzle}
+
+    while True:
+        c = input("options (1:solve, 2: generate, q: quit >> ")
+        if c == 'q':
+            break
+        else:
+            cho.get(c,do_nothing)()
+
+
+        
 
 
 if __name__ == "__main__":
@@ -48,50 +87,25 @@ if __name__ == "__main__":
           '004172600', '000640000', '005200007', '000500001', '009764520']
     s6 = ['002070490', '540090000', '709408000', '071000839',
           '005901200', '920007561', '090703100', '000029786', '007010903']
+    s6 = ['008712305', '512030000', '030859012', '103548020',
+          '825900134', '070321050', '300105260', '051200083', '209003501']
+    s6 = ['700500040', '001007605', '006300200', '403200000',
+          '000000000', '000008506', '008002700', '509800400', '020009001']
+    s6 = ['002000090', '840000106', '000870040', '000023500',
+          '003000200', '005490000', '020081000', '901000082', '030000400']
+    s6 = ['800001000', '350060810', '000300060', '000040350',
+          '500706002', '079020000', '010002000', '048030091', '000800005']
+    s6 = ['285010003', '010000000', '000400060', '000320001',
+          '090000030', '600071000', '050008000', '000000090', '800060254']
+    s6 = ['000600120', '000000809', '402090006', '009403001',
+          '008000500', '600509200', '300060902', '706000000', '094005000']
+    s6 = ['060001008', '080000046', '004002305', '000190000',
+          '000607000', '000085000', '802500700', '490000020', '500400090']
 '''
 TODO : gui for enter the sudoku
 TODO : gui for sudoku app.
 '''
 
-#main()
+main()
+#main_int()
 
-while True:
-    b1 = Board()
-    solver.generate_puzzle(b1.bd)
-    b1.display(stop=True)
-
-
-    ans = []
-    solver.find_solution(b1,ans)
-    for bd in ans:
-        Board(bd).show()
-        c = input("more answer ?")
-    
-
-    c = input('more ?')
-    if c == 'q': break
-
-while False:
-    b2 = Board()
-    b2.fillFromString(s6)
-    b2.display(stop=True)
-
-    ans = []
-    solver.find_solution(b2, ans)
-
-    for bd in ans:
-        Board(bd).show()
-        c = input("more answer ?")
-
-    c = input("more ?")
-    if c == 'q':
-        break
-
-while False:
-    b2 = Board()
-    b2.fillFromString(s6)
-    b2.display(stop=True)
-    ans = []
-    solver.find_solution(b2, ans)
-    solver.display(ans[0],stop=True)
-    break;
